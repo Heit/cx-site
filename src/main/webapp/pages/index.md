@@ -1,5 +1,5 @@
 Introducing Circumflex  {#intro}
-======================
+=======================
 
 Circumflex is a set of software components for quick and robust application development
 using the [Scala][] programming language.

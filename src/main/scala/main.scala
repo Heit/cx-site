@@ -6,7 +6,10 @@ import ru.ciridiri.{Page, CiriDiri}
 import ru.circumflex.md.Markdown
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.lang.StringBuilder
+import java.io.File
+import org.apache.commons.io.FileUtils._
+import java.lang.{String, StringBuilder}
+import org.apache.commons.io.filefilter.{DirectoryFileFilter}
 
 class MainRouter extends RequestRouter
     with FreemarkerHelper {
@@ -16,7 +19,37 @@ class MainRouter extends RequestRouter
   'sitemap := Page.findByUri("/sitemap")    // read sitemap
 
   new CiriDiri {    // let ciridiri handle the rest
+
     override def onFound(page: Page) = "toc" := new TOC(page.toHtml)
+
+    override def onUpdate(page: Page) = {
+      val parent = (new File(page.path)).getParentFile()
+      val navFile = new File(parent, "nav.md")
+      val data = parent.listFiles()
+          .toList
+          .sort((f1, f2) => f1.getName < f2.getName)
+          .flatMap {
+        case f if f.isDirectory => Some(new File(f, "index.md"))
+        case f if f.getName.endsWith(".md") => Some(f)
+        case _ => None
+      }.flatMap(f => Page.findByPath(f.getAbsolutePath))
+          .filter(p => p.title != "")
+          .map(p => "* " + p.toString)
+          .mkString("\n")
+
+      writeStringToFile(navFile, data, "UTF-8")
+    }
+
+    override def onDelete(page: Page) = {
+      val parent = (new File(page.path)).getParentFile()
+      val navFile = new File(parent, "nav.md")
+      val data: String = readFileToString(navFile, "UTF-8")
+          .split("\n")
+          .filter(l => l != "* " + page.toString)
+          .mkString("\n")
+      writeStringToFile(navFile, data, "UTF-8")
+    }
+
   }
 
   // Markdown Live
@@ -26,6 +59,9 @@ class MainRouter extends RequestRouter
       if (isXhr)
         Page.findByUriOrEmpty("/.md-cheatsheet").toHtml
       else rewrite("/.md-cheatsheet.html")
+
+  get("+/") = redirect(uri(1) + "/index.html")
+  get("+") = redirect(uri(1) + ".html")
 
 }
 
