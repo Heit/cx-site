@@ -9,16 +9,15 @@ import java.util.Date
 import java.io.File
 import org.apache.commons.io.FileUtils._
 import java.lang.{String, StringBuilder}
-import org.apache.commons.io.filefilter.{DirectoryFileFilter}
+import org.apache.commons.io.filefilter.{TrueFileFilter, DirectoryFileFilter}
 
 class MainRouter extends RequestRouter
     with FreemarkerHelper {
-
   'host := header.getOrElse("Host", "")
   'currentYear := new SimpleDateFormat("yyyy").format(new Date)
-  'sitemap := Page.findByUri("/sitemap")    // read sitemap
+  'sitemap := Page.findByUri("/nav") // read sitemap
 
-  new CiriDiri {    // let ciridiri handle the rest
+  new CiriDiri { // let ciridiri handle the rest
 
     override def onFound(page: Page) = "toc" := new TOC(page.toHtml)
 
@@ -74,6 +73,7 @@ class TOC(val html: String) {
     def toHtml: String =
       if (id == null) "<span>" + body + "</span>"
       else "<a href=\"#" + id + "\">" + body + "</a>"
+
     override def toString = toHtml
   }
   val headings: Seq[Heading] = TOC.rHeadings.findAllIn(html)
@@ -107,3 +107,20 @@ class TOC(val html: String) {
     "<ul>\n" + sb.toString + "</ul>"
   }
 }
+
+class Nav() {
+  val toHtml: String = {
+
+    def recursiveListFiles(f: File): List[File] = {
+      val list:List[File] = Nil;
+      for (f <- (new File("src/main/webapp/pages")).listFiles ) {list = list ::: List(f)}
+      list;
+    }
+    val files = recursiveListFiles(new File(Page.contentDir))
+//    files.filter( f => """.*\.md$""".r.findFirstIn(f.getName).isDefined)
+  }
+}
+
+
+
+
