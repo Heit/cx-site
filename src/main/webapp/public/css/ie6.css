@@ -1,0 +1,35 @@
+/*clearing*/
+.wrap, .head, #nav li {height: 1%}
+/* png fixes */
+.bg-png-crop {
+filter: expression(
+(runtimeStyle.filter == '') ? runtimeStyle.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(src='+currentStyle.backgroundImage.split('\"')[1]+', sizingMethod=crop)' : runtimeStyle.filter,
+runtimeStyle.backgroundImage = 'none');
+}
+
+.bg-png-scale {
+filter: expression(
+(runtimeStyle.backgroundImage != 'none') ? runtimeStyle.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(src='+currentStyle.backgroundImage.split('\"')[1]+', sizingMethod=scale)' : runtimeStyle.filter,
+runtimeStyle.backgroundImage = 'none');
+}
+
+img.this-src-png {
+width: expression(width);
+filter: expression( (runtimeStyle.filter == '') ? runtimeStyle.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+src+"', sizingMethod='image')" : '',
+src = '../i/0.gif');
+}
+
+#nav li {vertical-align: top}
+#content, .voc-letters, .voc-letters a, #footer {zoom: 1}
+#content {position: relative}
+#main-nav {
+    position: absolute;
+    top: 0;
+    right: 21px;
+    margin-top: 0;
+}
+#logo {display: inline}
+.h-header {height: 64px}
+.docs blockquote big {display: none; d\isplay: inline; line-height: 34px}
+.docs bl\ockquote {position: relative; top: -26px}
+#summaries td, td {border: 1px solid #eee}
